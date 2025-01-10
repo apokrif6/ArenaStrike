@@ -5,23 +5,46 @@
 #include "GameFramework/Character.h"
 #include "ASCharacter.generated.h"
 
+#pragma region Forward Declarations
+class UCameraComponent;
+class USpringArmComponent;
+class UWeaponComponent;
+struct FInputActionValue;
+class UInputAction;
+class UInputMappingContext;
+#pragma endregion
+
 UCLASS(Abstract)
 class ARENASTRIKE_API AASCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AASCharacter();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> SwitchWeaponInputAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UWeaponComponent> WeaponComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UCameraComponent> CameraComponent;
+
+private:
+	UFUNCTION()
+	void SwitchWeapon(const FInputActionValue& Value);
 };
