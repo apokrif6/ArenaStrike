@@ -30,6 +30,8 @@ void AASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetMesh()->LinkAnimClassLayers(AnimLayersClass);
+
 	const APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (!PlayerController)
 	{

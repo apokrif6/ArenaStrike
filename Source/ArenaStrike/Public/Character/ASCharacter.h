@@ -29,6 +29,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, Blueprintable, Category = "Animation")
+	TSubclassOf<UAnimInstance> AnimLayersClass;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
