@@ -7,6 +7,7 @@
 #include "Animation/Interfaces/ASAnimationInterface.h"
 #include "ASAnimInstance.generated.h"
 
+class UCharacterMovementComponent;
 /**
  * Base class for anim blueprints
  */
@@ -14,4 +15,17 @@ UCLASS()
 class ARENASTRIKE_API UASAnimInstance : public UAnimInstance, public IASAnimationInterface
 {
 	GENERATED_BODY()
+
+public:
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+protected:
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	UCharacterMovementComponent* GetCharacterMovementComponent() const;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	FVector Velocity = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Movement")
+	FVector Velocity2D = FVector::ZeroVector;
 };
