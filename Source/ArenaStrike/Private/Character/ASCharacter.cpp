@@ -2,15 +2,22 @@
 
 #include "ArenaStrike/Public/Character/ASCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "..\..\Public\Animation\Interfaces\ASAnimationInterface.h"
+#include "GameplayAbilitySpec.h"
+#include "Animation/Interfaces/ASAnimationInterface.h"
+#include "AbilitySystem/Input/GameplayAbilitiesInputBindingsDataAsset.h"
 #include "Camera/CameraComponent.h"
+#include "Character/Movement/ASCharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Weapon/WeaponComponent.h"
 
-AASCharacter::AASCharacter()
+DEFINE_LOG_CATEGORY(LogASCharacter);
+
+AASCharacter::AASCharacter(const FObjectInitializer& ObjectInitializer) : Super(
+	ObjectInitializer.SetDefaultSubobjectClass<UASCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -24,6 +31,27 @@ AASCharacter::AASCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 	CameraComponent->bUsePawnControlRotation = false;
+
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+}
+
+void AASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	InitializeGameplayAbilitySystem();
+}
+
+void AASCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+
+	SetOwner(NewController);
 }
 
 void AASCharacter::BeginPlay()
@@ -56,6 +84,23 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		if (GameplayAbilitiesInputBindings)
+		{
+			for (const FGameplayInputAbilityInfo& InputAbility : GameplayAbilitiesInputBindings->GetInputAbilities())
+			{
+				if (InputAbility.IsValid())
+				{
+					const UInputAction* InputAction = InputAbility.InputAction.LoadSynchronous();
+					const int32 InputID = InputAbility.InputID;
+
+					EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this,
+					                                   &ThisClass::OnAbilityInputPressed, InputID);
+					EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this,
+					                                   &ThisClass::OnAbilityInputReleased, InputID);
+				}
+			}
+		}
+
 		EnhancedInputComponent->BindAction(SwitchWeaponInputAction, ETriggerEvent::Triggered, this,
 		                                   &ThisClass::SwitchWeapon);
 
@@ -65,6 +110,36 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered, this,
 		                                   &ThisClass::Move);
 	}
+}
+
+void AASCharacter::InitializeGameplayAbilitySystem() const
+{
+	if (!GameplayAbilitiesInputBindings)
+	{
+		return;
+	}
+
+	for (const FGameplayInputAbilityInfo& InputAbility : GameplayAbilitiesInputBindings->GetInputAbilities())
+	{
+		if (InputAbility.IsValid())
+		{
+			const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec{
+				InputAbility.GameplayAbilityClass.LoadSynchronous(), 1,
+				InputAbility.InputID
+			};
+			AbilitySystemComponent->GiveAbility(AbilitySpec);
+		}
+	}
+}
+
+void AASCharacter::OnAbilityInputPressed(int32 InputID)
+{
+	AbilitySystemComponent->AbilityLocalInputPressed(InputID);
+}
+
+void AASCharacter::OnAbilityInputReleased(int32 InputID)
+{
+	AbilitySystemComponent->AbilityLocalInputReleased(InputID);
 }
 
 void AASCharacter::SwitchWeapon(const FInputActionValue& Value)
@@ -92,10 +167,10 @@ void AASCharacter::SwitchWeapon(const FInputActionValue& Value)
 
 	WeaponComponent->SetEquippedWeapon(NewWeapon);
 
-	if (const UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && AnimInstance->Implements<
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && AnimInstance->Implements<
 		UASAnimationInterface>())
 	{
-		IASAnimationInterface::Execute_ReceiveEquippedWeapon(GetMesh()->GetAnimInstance(), NewWeapon);
+		IASAnimationInterface::Execute_ReceiveEquippedWeapon(AnimInstance, NewWeapon);
 	}
 }
 
@@ -117,7 +192,7 @@ void AASCharacter::Move(const FInputActionValue& Value)
 	if (Controller)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation {0, Rotation.Yaw, 0};
+		const FRotator YawRotation{0, Rotation.Yaw, 0};
 
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 

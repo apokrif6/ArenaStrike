@@ -7,6 +7,7 @@
 #include "ASAnimationInterface.generated.h"
 
 enum class EEquippedWeapon : uint8;
+enum class EGait : uint8;
 
 UINTERFACE()
 class UASAnimationInterface : public UInterface
@@ -20,5 +21,8 @@ class ARENASTRIKE_API IASAnimationInterface
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Animation")
-	void ReceiveEquippedWeapon(const EEquippedWeapon InEquippedWeapon);
+	void ReceiveEquippedWeapon(const EEquippedWeapon EquippedWeapon);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Animation")
+	void ReceiveCurrentGait(const EGait CurrentGait);
 };
