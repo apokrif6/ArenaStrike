@@ -20,7 +20,7 @@ struct FGameplayInputAbilityInfo
 	TSoftClassPtr<UGameplayAbility> GameplayAbilityClass;
 
 	UPROPERTY(EditAnywhere, Category = "GameplayInputAbilityInfo")
-	TSoftObjectPtr<UInputAction> InputAction;
+	TObjectPtr<UInputAction> InputAction;
 
 	UPROPERTY(VisibleAnywhere, Category = "GameplayInputAbilityInfo")
 	int32 InputID = 0;

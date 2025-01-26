@@ -30,6 +30,11 @@ public:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	UGameplayAbilitiesInputBindingsDataAsset* GetGameplayAbilitiesInputBindings() const
+	{
+		return GameplayAbilitiesInputBindings;
+	}
+
 protected:
 	virtual void PostInitializeComponents() override;
 
@@ -44,9 +49,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> SwitchWeaponInputAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> LookInputAction;
@@ -75,9 +77,6 @@ private:
 
 	UFUNCTION()
 	void OnAbilityInputReleased(int32 InputID);
-
-	UFUNCTION()
-	void SwitchWeapon(const FInputActionValue& Value);
 
 	UFUNCTION()
 	void Look(const FInputActionValue& Value);

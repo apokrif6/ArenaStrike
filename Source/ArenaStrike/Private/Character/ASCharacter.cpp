@@ -90,7 +90,7 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			{
 				if (InputAbility.IsValid())
 				{
-					const UInputAction* InputAction = InputAbility.InputAction.LoadSynchronous();
+					const UInputAction* InputAction = InputAbility.InputAction;
 					const int32 InputID = InputAbility.InputID;
 
 					EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this,
@@ -100,9 +100,6 @@ void AASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 				}
 			}
 		}
-
-		EnhancedInputComponent->BindAction(SwitchWeaponInputAction, ETriggerEvent::Triggered, this,
-		                                   &ThisClass::SwitchWeapon);
 
 		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered, this,
 		                                   &ThisClass::Look);
@@ -140,38 +137,6 @@ void AASCharacter::OnAbilityInputPressed(int32 InputID)
 void AASCharacter::OnAbilityInputReleased(int32 InputID)
 {
 	AbilitySystemComponent->AbilityLocalInputReleased(InputID);
-}
-
-void AASCharacter::SwitchWeapon(const FInputActionValue& Value)
-{
-	const int TruncatedValue = UKismetMathLibrary::FTrunc(Value.Get<float>());
-
-	//TODO
-	//create better implementation
-	//maybe cast int to uenum?
-	EEquippedWeapon NewWeapon;
-	switch (TruncatedValue)
-	{
-	case 1:
-		NewWeapon = EEquippedWeapon::Unarmed;
-		break;
-	case 2:
-		NewWeapon = EEquippedWeapon::Pistol;
-		break;
-	case 3:
-		NewWeapon = EEquippedWeapon::Rifle;
-		break;
-	default:
-		NewWeapon = EEquippedWeapon::Unarmed;
-	}
-
-	WeaponComponent->SetEquippedWeapon(NewWeapon);
-
-	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance(); AnimInstance && AnimInstance->Implements<
-		UASAnimationInterface>())
-	{
-		IASAnimationInterface::Execute_ReceiveEquippedWeapon(AnimInstance, NewWeapon);
-	}
 }
 
 void AASCharacter::Look(const FInputActionValue& Value)
