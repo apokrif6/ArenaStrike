@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Animation/Locomotion/LocomotionAnimationData.h"
 #include "Animation/Interfaces/ASAnimationInterface.h"
 #include "ASAnimInstance.generated.h"
 
+class AASCharacter;
 class UASCharacterMovementComponent;
 /**
  * Base class for anim blueprints
@@ -17,15 +19,31 @@ class ARENASTRIKE_API UASAnimInstance : public UAnimInstance, public IASAnimatio
 	GENERATED_BODY()
 
 public:
+	virtual void NativeInitializeAnimation() override;
+
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
- 
+
 protected:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
 	UASCharacterMovementComponent* GetCharacterMovementComponent() const;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	FVector Velocity = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion")
+	FLocomotionAnimationData LocomotionData;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Movement")
-	FVector Velocity2D = FVector::ZeroVector;
+private:
+	UPROPERTY()
+	AASCharacter* OwnerCharacter;
+
+	void GetVelocityData();
+
+	void GetRotationData();
+
+	void UpdateOrientationData();
+
+	static ELocomotionDirection CalculateLocomotionDirection(const ELocomotionDirection CurrentLocomotionDirection,
+	                                                         const float CurrentLocomotionAngle,
+	                                                         const float BackwardMinThreshold,
+	                                                         const float BackwardMaxThreshold,
+	                                                         const float ForwardMinThreshold,
+	                                                         const float ForwardMaxThreshold, const float Deadzone);
 };
