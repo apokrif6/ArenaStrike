@@ -27,7 +27,7 @@ void UASAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	GetVelocityData();
-	GetRotationData();
+	GetRotationData(DeltaSeconds);
 	UpdateOrientationData();
 	LocomotionData.LocomotionDirection = CalculateLocomotionDirection(LocomotionData.LocomotionDirection,
 	                                                                  LocomotionData.VelocityLocomotionAngle, -130.f,
@@ -51,9 +51,21 @@ void UASAnimInstance::GetVelocityData()
 	LocomotionData.Velocity2D = LocomotionData.Velocity * FVector{1.f, 1.f, 0.f};
 }
 
-void UASAnimInstance::GetRotationData()
+void UASAnimInstance::GetRotationData(const float DeltaSeconds)
 {
 	LocomotionData.Rotation = OwnerCharacter->GetActorRotation();
+	LocomotionData.LastYaw = LocomotionData.CurrentYaw;
+	LocomotionData.CurrentYaw = LocomotionData.Rotation.Yaw;
+	LocomotionData.DeltaYaw = LocomotionData.CurrentYaw - LocomotionData.LastYaw;
+
+	float InterpolatedYaw = UKismetMathLibrary::SafeDivide(LocomotionData.DeltaYaw, DeltaSeconds) / 4.f;
+	if (LocomotionData.LocomotionDirection == ELocomotionDirection::Backward)
+	{
+		//inverse for backward additive lean
+		InterpolatedYaw *= -1.f;
+	}
+
+	LocomotionData.LeanAngle = FMath::ClampAngle(InterpolatedYaw, -90.f, 90.f);
 }
 
 void UASAnimInstance::UpdateOrientationData()
