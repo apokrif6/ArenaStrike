@@ -27,6 +27,7 @@ void UASAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	GetVelocityData();
+	GetAccelerationData();
 	GetRotationData(DeltaSeconds);
 	UpdateOrientationData();
 	LocomotionData.LocomotionDirection = CalculateLocomotionDirection(LocomotionData.LocomotionDirection,
@@ -49,6 +50,13 @@ void UASAnimInstance::GetVelocityData()
 {
 	LocomotionData.Velocity = GetCharacterMovementComponent()->Velocity;
 	LocomotionData.Velocity2D = LocomotionData.Velocity * FVector{1.f, 1.f, 0.f};
+}
+
+void UASAnimInstance::GetAccelerationData()
+{
+	LocomotionData.Acceleration = GetCharacterMovementComponent()->GetCurrentAcceleration();
+	LocomotionData.Acceleration2D = LocomotionData.Acceleration * FVector{1.f, 1.f, 0.f};
+	LocomotionData.bIsAccelerating = !FMath::IsNearlyEqual(LocomotionData.Acceleration2D.Size2D(), 0.f);
 }
 
 void UASAnimInstance::GetRotationData(const float DeltaSeconds)

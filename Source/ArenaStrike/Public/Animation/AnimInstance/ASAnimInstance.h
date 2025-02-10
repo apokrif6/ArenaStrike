@@ -36,6 +36,8 @@ private:
 
 	void GetVelocityData();
 
+	void GetAccelerationData();
+
 	void GetRotationData(const float DeltaSeconds);
 
 	void UpdateOrientationData();
