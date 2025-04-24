@@ -20,9 +20,9 @@ class ARENASTRIKE_API IASAnimationInterface
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Animation")
+	UFUNCTION(BlueprintNativeEvent, Category = "Animation")
 	void ReceiveEquippedWeapon(const EEquippedWeapon EquippedWeapon);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Animation")
-	void ReceiveCurrentGait(const EGait CurrentGait);
+	UFUNCTION(BlueprintNativeEvent, Category = "Animation")
+	void ReceiveIncomingGait(const EGait CurrentGait);
 };

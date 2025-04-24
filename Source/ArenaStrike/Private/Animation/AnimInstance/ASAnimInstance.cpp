@@ -26,14 +26,18 @@ void UASAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-	GetVelocityData();
-	GetAccelerationData();
-	GetRotationData(DeltaSeconds);
+	UpdateVelocityData();
+	UpdateAccelerationData();
+	UpdateRotationData(DeltaSeconds);
 	UpdateOrientationData();
-	LocomotionData.LocomotionDirection = CalculateLocomotionDirection(LocomotionData.LocomotionDirection,
-	                                                                  LocomotionData.VelocityLocomotionAngle, -130.f,
-	                                                                  130.f,
-	                                                                  -50.f, 50.f, 20.f);
+	UpdateGaitData();
+}
+
+void UASAnimInstance::ReceiveIncomingGait_Implementation(const EGait IncomingGait)
+{
+	LocomotionData.IncomingGait = IncomingGait;
+
+	UpdateGaitData();
 }
 
 UASCharacterMovementComponent* UASAnimInstance::GetCharacterMovementComponent() const
@@ -46,20 +50,28 @@ UASCharacterMovementComponent* UASAnimInstance::GetCharacterMovementComponent() 
 	return nullptr;
 }
 
-void UASAnimInstance::GetVelocityData()
+void UASAnimInstance::UpdateVelocityData()
 {
 	LocomotionData.Velocity = GetCharacterMovementComponent()->Velocity;
 	LocomotionData.Velocity2D = LocomotionData.Velocity * FVector{1.f, 1.f, 0.f};
 }
 
-void UASAnimInstance::GetAccelerationData()
+void UASAnimInstance::UpdateAccelerationData()
 {
 	LocomotionData.Acceleration = GetCharacterMovementComponent()->GetCurrentAcceleration();
 	LocomotionData.Acceleration2D = LocomotionData.Acceleration * FVector{1.f, 1.f, 0.f};
 	LocomotionData.bIsAccelerating = !FMath::IsNearlyEqual(LocomotionData.Acceleration2D.Size2D(), 0.f);
 }
 
-void UASAnimInstance::GetRotationData(const float DeltaSeconds)
+void UASAnimInstance::UpdateLocationData()
+{
+	LocomotionData.PreviousFrameWorldLocation = LocomotionData.WorldLocation;
+	LocomotionData.WorldLocation = OwnerCharacter->GetActorLocation();
+	LocomotionData.DeltaWorldLocationLength = (LocomotionData.WorldLocation - LocomotionData.PreviousFrameWorldLocation)
+		.Size();
+}
+
+void UASAnimInstance::UpdateRotationData(const float DeltaSeconds)
 {
 	LocomotionData.Rotation = OwnerCharacter->GetActorRotation();
 	LocomotionData.LastYaw = LocomotionData.CurrentYaw;
@@ -78,8 +90,22 @@ void UASAnimInstance::GetRotationData(const float DeltaSeconds)
 
 void UASAnimInstance::UpdateOrientationData()
 {
+	LocomotionData.PreviousFrameLocomotionDirection = LocomotionData.LocomotionDirection;
+
 	LocomotionData.VelocityLocomotionAngle = UKismetAnimationLibrary::CalculateDirection(
 		LocomotionData.Velocity2D, LocomotionData.Rotation);
+
+	LocomotionData.LocomotionDirection = CalculateLocomotionDirection(LocomotionData.LocomotionDirection,
+	                                                                  LocomotionData.VelocityLocomotionAngle, -130.f,
+	                                                                  130.f,
+	                                                                  -50.f, 50.f, 20.f);
+}
+
+void UASAnimInstance::UpdateGaitData()
+{
+	LocomotionData.PreviousFrameGait = LocomotionData.CurrentGait;
+	LocomotionData.CurrentGait = LocomotionData.IncomingGait;
+	LocomotionData.bGaitWasChanged = LocomotionData.PreviousFrameGait != LocomotionData.CurrentGait;
 }
 
 ELocomotionDirection UASAnimInstance::CalculateLocomotionDirection(

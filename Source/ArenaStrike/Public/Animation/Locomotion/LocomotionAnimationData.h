@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "LocomotionDirection.h"
+#include "Character/Movement/Gait.h"
 #include "LocomotionAnimationData.generated.h"
 
+enum class EGait : uint8;
 enum class ELocomotionDirection : uint8;
 
 USTRUCT(BlueprintType)
@@ -32,6 +34,17 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 	bool bIsAccelerating = false;
 #pragma endregion
 
+#pragma region Location
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Location")
+	FVector PreviousFrameWorldLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Location")
+	FVector WorldLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Location")
+	float DeltaWorldLocationLength = ForceInitToZero;
+#pragma endregion
+	
 #pragma region Rotation
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
 	FRotator Rotation = FRotator::ZeroRotator;
@@ -52,12 +65,31 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 	float DeltaYaw = ForceInitToZero;
 #pragma endregion
 
-	UPROPERTY(BlueprintReadOnly, Category = "Locomotion")
+#pragma region Orientation
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	float VelocityLocomotionAngle = ForceInitToZero;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Locomotion")
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
+	ELocomotionDirection PreviousFrameLocomotionDirection = ELocomotionDirection::Forward;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	ELocomotionDirection LocomotionDirection = ELocomotionDirection::Forward;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Locomotion")
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	float LeanAngle = ForceInitToZero;
+#pragma endregion
+
+#pragma region Gait
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Gait")
+	EGait IncomingGait = EGait::Walking;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Gait")
+	EGait PreviousFrameGait = EGait::Walking;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Gait")
+	EGait CurrentGait = EGait::Walking;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Gait")
+	bool bGaitWasChanged = false;
+#pragma endregion
 };

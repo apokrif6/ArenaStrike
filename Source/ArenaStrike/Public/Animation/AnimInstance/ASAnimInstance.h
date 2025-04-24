@@ -23,6 +23,8 @@ public:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	virtual void ReceiveIncomingGait_Implementation(const EGait IncomingGait) override;
+
 protected:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
 	UASCharacterMovementComponent* GetCharacterMovementComponent() const;
@@ -34,13 +36,17 @@ private:
 	UPROPERTY()
 	AASCharacter* OwnerCharacter;
 
-	void GetVelocityData();
+	void UpdateVelocityData();
 
-	void GetAccelerationData();
+	void UpdateAccelerationData();
 
-	void GetRotationData(const float DeltaSeconds);
+	void UpdateLocationData();
+
+	void UpdateRotationData(const float DeltaSeconds);
 
 	void UpdateOrientationData();
+
+	void UpdateGaitData();
 
 	static ELocomotionDirection CalculateLocomotionDirection(const ELocomotionDirection CurrentLocomotionDirection,
 	                                                         const float CurrentLocomotionAngle,

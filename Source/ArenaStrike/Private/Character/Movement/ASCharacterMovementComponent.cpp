@@ -37,7 +37,7 @@ void UASCharacterMovementComponent::SetGait(const EGait InGait)
 	if (UAnimInstance* AnimInstance = GetCharacterOwner()->GetMesh()->GetAnimInstance(); AnimInstance &&
 		AnimInstance->Implements<UASAnimationInterface>())
 	{
-		IASAnimationInterface::Execute_ReceiveCurrentGait(AnimInstance, CurrentGait);
+		IASAnimationInterface::Execute_ReceiveIncomingGait(AnimInstance, CurrentGait);
 	}
 }
 

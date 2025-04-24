@@ -27,4 +27,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Stop|Animations")
 	FLocomotionDirectionAnimations JoggingStopLocomotionDirectionAnimations;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Start|Animations")
+	FLocomotionDirectionAnimations WalkingStartLocomotionDirectionAnimations;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Start|Animations")
+	FLocomotionDirectionAnimations JoggingStartLocomotionDirectionAnimations;
 };
