@@ -50,6 +50,11 @@ UASCharacterMovementComponent* UASAnimInstance::GetCharacterMovementComponent() 
 	return nullptr;
 }
 
+void UASAnimInstance::SavePivotDataOnPivotStateBecomeRelevant()
+{
+	LocomotionData.PivotAcceleration2D = LocomotionData.Acceleration2D;
+}
+
 void UASAnimInstance::UpdateVelocityData()
 {
 	LocomotionData.Velocity = GetCharacterMovementComponent()->Velocity;

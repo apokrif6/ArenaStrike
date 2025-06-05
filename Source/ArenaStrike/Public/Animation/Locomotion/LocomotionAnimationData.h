@@ -31,6 +31,9 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 	FVector Acceleration2D = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Acceleration")
+	FVector PivotAcceleration2D = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Acceleration")
 	bool bIsAccelerating = false;
 #pragma endregion
 

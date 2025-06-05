@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion")
 	FLocomotionAnimationData LocomotionData;
 
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void SavePivotDataOnPivotStateBecomeRelevant();
+
 private:
 	UPROPERTY()
 	AASCharacter* OwnerCharacter;
