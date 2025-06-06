@@ -100,10 +100,18 @@ void UASAnimInstance::UpdateOrientationData()
 	LocomotionData.VelocityLocomotionAngle = UKismetAnimationLibrary::CalculateDirection(
 		LocomotionData.Velocity2D, LocomotionData.Rotation);
 
+	LocomotionData.AccelerationLocomotionAngle = UKismetAnimationLibrary::CalculateDirection(
+		LocomotionData.Acceleration2D, LocomotionData.Rotation);
+
 	LocomotionData.LocomotionDirection = CalculateLocomotionDirection(LocomotionData.LocomotionDirection,
 	                                                                  LocomotionData.VelocityLocomotionAngle, -130.f,
 	                                                                  130.f,
 	                                                                  -50.f, 50.f, 20.f);
+
+	LocomotionData.AccelerationLocomotionDirection = CalculateLocomotionDirection(LocomotionData.AccelerationLocomotionDirection,
+																	  LocomotionData.AccelerationLocomotionAngle, -130.f,
+																	  130.f,
+																	  -50.f, 50.f, 20.f);
 }
 
 void UASAnimInstance::UpdateGaitData()

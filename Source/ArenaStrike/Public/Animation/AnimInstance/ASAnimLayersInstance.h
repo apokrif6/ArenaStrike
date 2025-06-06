@@ -33,4 +33,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Start|Animations")
 	FLocomotionDirectionAnimations JoggingStartLocomotionDirectionAnimations;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pivot|Animations")
+	FLocomotionDirectionAnimations WalkingPivotLocomotionDirectionAnimations;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pivot|Animations")
+	FLocomotionDirectionAnimations JoggingPivotLocomotionDirectionAnimations;
 };

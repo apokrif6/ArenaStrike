@@ -73,11 +73,17 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 	float VelocityLocomotionAngle = ForceInitToZero;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
+	float AccelerationLocomotionAngle = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	ELocomotionDirection PreviousFrameLocomotionDirection = ELocomotionDirection::Forward;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	ELocomotionDirection LocomotionDirection = ELocomotionDirection::Forward;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
+	ELocomotionDirection AccelerationLocomotionDirection = ELocomotionDirection::Forward;
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	float LeanAngle = ForceInitToZero;
 #pragma endregion
