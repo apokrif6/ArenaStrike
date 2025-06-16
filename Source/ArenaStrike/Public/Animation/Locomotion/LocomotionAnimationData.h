@@ -66,6 +66,12 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
 	float DeltaYaw = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
+	float RootYawOffset = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
+	float AimPitch = ForceInitToZero;
 #pragma endregion
 
 #pragma region Orientation

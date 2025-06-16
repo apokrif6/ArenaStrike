@@ -39,4 +39,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pivot|Animations")
 	FLocomotionDirectionAnimations JoggingPivotLocomotionDirectionAnimations;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AimOffset|Animations")
+	TObjectPtr<UBlendSpace> AimOffsetBlendSpace;
 };

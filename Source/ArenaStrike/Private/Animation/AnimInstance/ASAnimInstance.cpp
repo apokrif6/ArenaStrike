@@ -82,6 +82,10 @@ void UASAnimInstance::UpdateRotationData(const float DeltaSeconds)
 	LocomotionData.LastYaw = LocomotionData.CurrentYaw;
 	LocomotionData.CurrentYaw = LocomotionData.Rotation.Yaw;
 	LocomotionData.DeltaYaw = LocomotionData.CurrentYaw - LocomotionData.LastYaw;
+	LocomotionData.RootYawOffset = UKismetMathLibrary::NormalizeAxis(
+		LocomotionData.RootYawOffset + LocomotionData.DeltaYaw * -1.f);
+
+	LocomotionData.AimPitch = UKismetMathLibrary::NormalizeAxis(OwnerCharacter->GetBaseAimRotation().Pitch);
 
 	float InterpolatedYaw = UKismetMathLibrary::SafeDivide(LocomotionData.DeltaYaw, DeltaSeconds) / 4.f;
 	if (LocomotionData.LocomotionDirection == ELocomotionDirection::Backward)
@@ -108,10 +112,11 @@ void UASAnimInstance::UpdateOrientationData()
 	                                                                  130.f,
 	                                                                  -50.f, 50.f, 20.f);
 
-	LocomotionData.AccelerationLocomotionDirection = CalculateLocomotionDirection(LocomotionData.AccelerationLocomotionDirection,
-																	  LocomotionData.AccelerationLocomotionAngle, -130.f,
-																	  130.f,
-																	  -50.f, 50.f, 20.f);
+	LocomotionData.AccelerationLocomotionDirection = CalculateLocomotionDirection(
+		LocomotionData.AccelerationLocomotionDirection,
+		LocomotionData.AccelerationLocomotionAngle, -130.f,
+		130.f,
+		-50.f, 50.f, 20.f);
 }
 
 void UASAnimInstance::UpdateGaitData()
