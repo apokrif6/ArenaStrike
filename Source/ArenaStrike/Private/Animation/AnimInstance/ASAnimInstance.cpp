@@ -29,6 +29,7 @@ void UASAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	UpdateVelocityData();
 	UpdateAccelerationData();
 	UpdateRotationData(DeltaSeconds);
+	UpdateRootYawOffsetData(DeltaSeconds);
 	UpdateOrientationData();
 	UpdateGaitData();
 }
@@ -53,6 +54,11 @@ UASCharacterMovementComponent* UASAnimInstance::GetCharacterMovementComponent() 
 void UASAnimInstance::SavePivotDataOnPivotStateBecomeRelevant()
 {
 	LocomotionData.PivotAcceleration2D = LocomotionData.Acceleration2D;
+}
+
+void UASAnimInstance::SetRootYawOffsetMode(const ERootYawOffsetMode RootYawOffsetMode)
+{
+	LocomotionData.RootYawOffsetMode = RootYawOffsetMode;
 }
 
 void UASAnimInstance::UpdateVelocityData()
@@ -82,8 +88,6 @@ void UASAnimInstance::UpdateRotationData(const float DeltaSeconds)
 	LocomotionData.LastYaw = LocomotionData.CurrentYaw;
 	LocomotionData.CurrentYaw = LocomotionData.Rotation.Yaw;
 	LocomotionData.DeltaYaw = LocomotionData.CurrentYaw - LocomotionData.LastYaw;
-	LocomotionData.RootYawOffset = UKismetMathLibrary::NormalizeAxis(
-		LocomotionData.RootYawOffset + LocomotionData.DeltaYaw * -1.f);
 
 	LocomotionData.AimPitch = UKismetMathLibrary::NormalizeAxis(OwnerCharacter->GetBaseAimRotation().Pitch);
 
@@ -97,6 +101,24 @@ void UASAnimInstance::UpdateRotationData(const float DeltaSeconds)
 	LocomotionData.LeanAngle = FMath::ClampAngle(InterpolatedYaw, -90.f, 90.f);
 }
 
+void UASAnimInstance::UpdateRootYawOffsetData(const float DeltaSeconds)
+{
+	if (LocomotionData.RootYawOffsetMode == ERootYawOffsetMode::Accumulate)
+	{
+		LocomotionData.RootYawOffset = UKismetMathLibrary::NormalizeAxis(
+			LocomotionData.RootYawOffset + LocomotionData.DeltaYaw * -1.f);
+	}
+	if (LocomotionData.RootYawOffsetMode == ERootYawOffsetMode::BlendOut)
+	{
+		LocomotionData.RootYawOffset = UKismetMathLibrary::FloatSpringInterp(LocomotionData.RootYawOffset,
+		                                                                     0.f, LocomotionData.
+		                                                                     RootYawOffsetBlendOutInterpolationFloatSpringState,
+		                                                                     80.f, 1.f,
+		                                                                     DeltaSeconds, 1.f, 0.5f);
+	}
+	LocomotionData.RootYawOffsetMode = ERootYawOffsetMode::BlendOut;
+}
+
 void UASAnimInstance::UpdateOrientationData()
 {
 	LocomotionData.PreviousFrameLocomotionDirection = LocomotionData.LocomotionDirection;
@@ -104,6 +126,10 @@ void UASAnimInstance::UpdateOrientationData()
 	LocomotionData.VelocityLocomotionAngle = UKismetAnimationLibrary::CalculateDirection(
 		LocomotionData.Velocity2D, LocomotionData.Rotation);
 
+	LocomotionData.VelocityLocomotionAngleWithRootYawOffset = UKismetMathLibrary::NormalizeAxis(
+		LocomotionData.VelocityLocomotionAngle - LocomotionData.RootYawOffset);
+
+	
 	LocomotionData.AccelerationLocomotionAngle = UKismetAnimationLibrary::CalculateDirection(
 		LocomotionData.Acceleration2D, LocomotionData.Rotation);
 

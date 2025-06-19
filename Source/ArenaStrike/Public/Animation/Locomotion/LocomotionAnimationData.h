@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "LocomotionDirection.h"
+#include "RootYawOffsetMode.h"
 #include "Character/Movement/Gait.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "LocomotionAnimationData.generated.h"
 
 enum class EGait : uint8;
-enum class ELocomotionDirection : uint8;
 
 USTRUCT(BlueprintType)
 struct ARENASTRIKE_API FLocomotionAnimationData
@@ -66,17 +67,27 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
 	float DeltaYaw = ForceInitToZero;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
+#pragma endregion
+#pragma region RootYawOffset
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|RootYawOffset")
 	float RootYawOffset = ForceInitToZero;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Rotation")
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|RootYawOffset")
 	float AimPitch = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|RootYawOffset")
+	ERootYawOffsetMode RootYawOffsetMode = ERootYawOffsetMode::Hold;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|RootYawOffset")
+	FFloatSpringState RootYawOffsetBlendOutInterpolationFloatSpringState;
 #pragma endregion
 
 #pragma region Orientation
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	float VelocityLocomotionAngle = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
+	float VelocityLocomotionAngleWithRootYawOffset = ForceInitToZero;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|Orientation")
 	float AccelerationLocomotionAngle = ForceInitToZero;

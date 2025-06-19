@@ -35,6 +35,9 @@ protected:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
 	void SavePivotDataOnPivotStateBecomeRelevant();
 
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void SetRootYawOffsetMode(const ERootYawOffsetMode RootYawOffsetMode);
+
 private:
 	UPROPERTY()
 	AASCharacter* OwnerCharacter;
@@ -46,6 +49,8 @@ private:
 	void UpdateLocationData();
 
 	void UpdateRotationData(const float DeltaSeconds);
+
+	void UpdateRootYawOffsetData(const float DeltaSeconds);
 
 	void UpdateOrientationData();
 
