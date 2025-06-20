@@ -5,6 +5,7 @@
 
 #include "Animation/Interfaces/ASAnimationInterface.h"
 #include "GameFramework/Character.h"
+#include "Weapon/Weapon.h"
 
 DEFINE_LOG_CATEGORY(LogASWeaponSystem);
 
@@ -13,34 +14,64 @@ UWeaponComponent::UWeaponComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UWeaponComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	OwnerCharacter = Cast<ACharacter>(GetOwner());
+	check(OwnerCharacter)
+	
+	for (auto AvailableWeapon : StartupWeapons)
+	{
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.Instigator = Cast<APawn>(GetOwner());
+		if (AWeapon* SpawnedWeapon = GetWorld()->SpawnActor<AWeapon>(AvailableWeapon.Value, FTransform::Identity,
+		                                                             ActorSpawnParameters))
+		{
+			SpawnedWeapons.Add(AvailableWeapon.Key, SpawnedWeapon);
+		}
+		else
+		{
+			UE_LOG(LogASWeaponSystem, Error, TEXT("Failed to spawn weapon %s"), *AvailableWeapon.Value->GetName());
+		}
+	}
+}
+
 void UWeaponComponent::EquipWeapon(const EEquippedWeapon InEquippedWeapon)
 {
-	if (EquippedWeapon == InEquippedWeapon)
+	if (const EEquippedWeapon* EquippedWeapon = SpawnedWeapons.FindKey(EquippedWeaponActor);
+		EquippedWeapon && *EquippedWeapon == InEquippedWeapon)
 	{
 		return;
 	}
 
-	EquippedWeapon = InEquippedWeapon;
-
-	const ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
-	if (!OwnerCharacter)
+	if (EquippedWeaponActor)
 	{
-		UE_LOG(LogASWeaponSystem, Error,
-		       TEXT("WeaponComponent can be used only with character, but owner %s is not a character"),
-		       *GetOwner()->GetName());
-		return;
+		EquippedWeaponActor->Unequip();
 	}
-
-	if (const TSubclassOf<UAnimInstance>* AnimLayerForWeapon = AnimationLayersForWeapons.Find(InEquippedWeapon);
-		AnimLayerForWeapon)
+	
+	if (InEquippedWeapon == EEquippedWeapon::Unarmed)
 	{
-		OwnerCharacter->GetMesh()->LinkAnimClassLayers(*AnimLayerForWeapon);
+		EquippedWeaponActor = nullptr;
+		OwnerCharacter->GetMesh()->LinkAnimClassLayers(UnarmedAnimationLayer);
+	}
+	
+	if (SpawnedWeapons.Find(InEquippedWeapon))
+	{
+		if (EquippedWeaponActor)
+		{
+			EquippedWeaponActor->Unequip();
+		}
+		EquippedWeaponActor = *SpawnedWeapons.Find(InEquippedWeapon);
 	}
 	else
 	{
-		UE_LOG(LogASWeaponSystem, Warning, TEXT("WeaponComponent for %s does not have animation layer for weapon %s"),
-		       *GetOwner()->GetName(), *UEnum::GetValueAsString(InEquippedWeapon));
+		UE_LOG(LogASWeaponSystem, Error, TEXT("Failed to equip weapon %s. Can't find associated spawned weapon"),
+		       *UEnum::GetValueAsString(InEquippedWeapon));
+		return;
 	}
+
+	EquippedWeaponActor->Equip();
 
 	if (UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance(); AnimInstance && AnimInstance->
 		Implements<UASAnimationInterface>())

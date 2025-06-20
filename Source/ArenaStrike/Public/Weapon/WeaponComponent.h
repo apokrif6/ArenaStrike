@@ -8,6 +8,7 @@
 #include "WeaponComponent.generated.h"
 
 
+class AWeapon;
 enum class EEquippedWeapon : uint8;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogASWeaponSystem, Log, All);
@@ -20,16 +21,28 @@ class ARENASTRIKE_API UWeaponComponent : public UActorComponent
 public:
 	UWeaponComponent();
 
+	virtual void BeginPlay() override;
+	
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	EEquippedWeapon GetEquippedWeapon() const { return EquippedWeapon; }
+	AWeapon* GetEquippedWeapon() const { return EquippedWeaponActor; }
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void EquipWeapon(const EEquippedWeapon InEquippedWeapon);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Animation")
-	TMap<EEquippedWeapon, TSubclassOf<UAnimInstance>> AnimationLayersForWeapons;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapons")
+	TMap<EEquippedWeapon, TSubclassOf<AWeapon>> StartupWeapons;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapons|Animation")
+	TSubclassOf<UAnimInstance> UnarmedAnimationLayer;
 
 private:
-	EEquippedWeapon EquippedWeapon = EEquippedWeapon::Unarmed;
+	UPROPERTY()
+	ACharacter* OwnerCharacter = nullptr;
+	
+	UPROPERTY()
+	AWeapon* EquippedWeaponActor = nullptr;
+
+	UPROPERTY()
+	TMap<EEquippedWeapon, AWeapon*> SpawnedWeapons;
 };
