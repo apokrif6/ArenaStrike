@@ -61,6 +61,54 @@ void UASAnimInstance::SetRootYawOffsetMode(const ERootYawOffsetMode RootYawOffse
 	LocomotionData.RootYawOffsetMode = RootYawOffsetMode;
 }
 
+void UASAnimInstance::SetTurnInPlaceDirection(const ETurnInPlaceDirection TurnInPlaceDirection)
+{
+	LocomotionData.TurnInPlaceSideDirection = TurnInPlaceDirection;
+}
+
+float UASAnimInstance::UpdateTurnInPlaceAnimationTime(const float DeltaSeconds)
+{
+	return LocomotionData.TurnInPlaceAnimationTime += DeltaSeconds;
+}
+
+void UASAnimInstance::ResetTurnInPlaceAnimationTime()
+{
+	LocomotionData.TurnInPlaceAnimationTime = 0.f;
+}
+
+void UASAnimInstance::SetFinalTurnInPlaceAnimation(UAnimSequence* FinalTurnInPlaceAnimation)
+{
+	LocomotionData.FinalTurnInPlaceAnimation = FinalTurnInPlaceAnimation;
+}
+
+void UASAnimInstance::ProcessTurnInPlaceYawCurve()
+{
+	LocomotionData.PreviousFrameTurnInPlaceYawCurveValue = LocomotionData.TurnInPlaceYawCurveValue;
+
+	// if true, we are recovering from turn in place. if false, we are turning in place
+	if (const float IsTurningCurveValue = GetCurveValue(IsTurningCurveName); IsTurningCurveValue < 1.f)
+	{
+		LocomotionData.PreviousFrameTurnInPlaceYawCurveValue = 0.f;
+		LocomotionData.TurnInPlaceYawCurveValue = 0.f;
+	}
+	else
+	{
+		LocomotionData.TurnInPlaceYawCurveValue = UKismetMathLibrary::SafeDivide(
+			GetCurveValue(TurnInPlaceYawCurveName), IsTurningCurveValue);
+
+		if (LocomotionData.PreviousFrameTurnInPlaceYawCurveValue != 0.f)
+		{
+			SetRootYawOffset(LocomotionData.RootYawOffset - (LocomotionData.TurnInPlaceYawCurveValue - LocomotionData.
+				PreviousFrameTurnInPlaceYawCurveValue));
+		}
+	}
+}
+
+void UASAnimInstance::SetRootYawOffset(const float Angle)
+{
+	LocomotionData.RootYawOffset = UKismetMathLibrary::NormalizeAxis(Angle);
+}
+
 void UASAnimInstance::UpdateVelocityData()
 {
 	LocomotionData.Velocity = GetCharacterMovementComponent()->Velocity;
@@ -105,8 +153,7 @@ void UASAnimInstance::UpdateRootYawOffsetData(const float DeltaSeconds)
 {
 	if (LocomotionData.RootYawOffsetMode == ERootYawOffsetMode::Accumulate)
 	{
-		LocomotionData.RootYawOffset = UKismetMathLibrary::NormalizeAxis(
-			LocomotionData.RootYawOffset + LocomotionData.DeltaYaw * -1.f);
+		SetRootYawOffset(LocomotionData.RootYawOffset + LocomotionData.DeltaYaw * -1.f);
 	}
 	if (LocomotionData.RootYawOffsetMode == ERootYawOffsetMode::BlendOut)
 	{
@@ -129,7 +176,6 @@ void UASAnimInstance::UpdateOrientationData()
 	LocomotionData.VelocityLocomotionAngleWithRootYawOffset = UKismetMathLibrary::NormalizeAxis(
 		LocomotionData.VelocityLocomotionAngle - LocomotionData.RootYawOffset);
 
-	
 	LocomotionData.AccelerationLocomotionAngle = UKismetAnimationLibrary::CalculateDirection(
 		LocomotionData.Acceleration2D, LocomotionData.Rotation);
 

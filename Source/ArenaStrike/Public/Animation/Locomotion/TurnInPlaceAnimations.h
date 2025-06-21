@@ -4,25 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "LocomotionDirectionAnimations.generated.h"
+#include "TurnInPlaceAnimations.generated.h"
 
 /**
- * Container for Direction animations used by layers
+ * Container for TurnInPlace animations used by layers
  */
 USTRUCT(BlueprintType)
-struct ARENASTRIKE_API FLocomotionDirectionAnimations
+struct ARENASTRIKE_API FTurnInPlaceAnimations
 {
 	GENERATED_BODY()
 
+	/**
+	 * 90 degrees
+	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Locomotion")
-	TObjectPtr<UAnimSequence> Forward;
+	TObjectPtr<UAnimSequence> LeftQuarter;
 
+	/**
+	 * 180 degrees
+	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Locomotion")
-	TObjectPtr<UAnimSequence> Backward;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Locomotion")
-	TObjectPtr<UAnimSequence> Left;
+	TObjectPtr<UAnimSequence> LeftHalf;
 
+	/**
+	 * 90 degrees
+	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Locomotion")
-	TObjectPtr<UAnimSequence> Right;
+	TObjectPtr<UAnimSequence> RightQuarter;
+
+	/**
+	 * 180 degrees
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Locomotion")
+	TObjectPtr<UAnimSequence> RightHalf;
 };

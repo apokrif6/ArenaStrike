@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "LocomotionDirection.h"
 #include "RootYawOffsetMode.h"
+#include "TurnInPlaceDirection.h"
 #include "Character/Movement/Gait.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "LocomotionAnimationData.generated.h"
-
-enum class EGait : uint8;
 
 USTRUCT(BlueprintType)
 struct ARENASTRIKE_API FLocomotionAnimationData
@@ -80,6 +79,24 @@ struct ARENASTRIKE_API FLocomotionAnimationData
 
 	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|RootYawOffset")
 	FFloatSpringState RootYawOffsetBlendOutInterpolationFloatSpringState;
+#pragma endregion
+
+#pragma region TurnInPlace
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|TurnInPlace")
+	ETurnInPlaceDirection TurnInPlaceSideDirection = ETurnInPlaceDirection::Left;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|TurnInPlace")
+	float TurnInPlaceAnimationTime = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|TurnInPlace")
+	UAnimSequence* FinalTurnInPlaceAnimation = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|TurnInPlace")
+	float TurnInPlaceYawCurveValue = ForceInitToZero;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Locomotion|TurnInPlace")
+	float PreviousFrameTurnInPlaceYawCurveValue = ForceInitToZero;
+
 #pragma endregion
 
 #pragma region Orientation

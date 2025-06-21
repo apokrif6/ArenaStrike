@@ -38,6 +38,36 @@ protected:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
 	void SetRootYawOffsetMode(const ERootYawOffsetMode RootYawOffsetMode);
 
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void SetTurnInPlaceDirection(const ETurnInPlaceDirection TurnInPlaceDirection);
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	float UpdateTurnInPlaceAnimationTime(const float DeltaSeconds);
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void ResetTurnInPlaceAnimationTime();
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void SetFinalTurnInPlaceAnimation(UAnimSequence* FinalTurnInPlaceAnimation);
+
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void ProcessTurnInPlaceYawCurve();
+
+	/**
+	 * Normalizes axis of the root yaw offset and set it
+	 */
+	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
+	void SetRootYawOffset(const float Angle);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curves")
+	FName DisableLHandIKCurveName = "DisableLHandIK";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curves")
+	FName IsTurningCurveName = "IsTurning";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Curves")
+	FName TurnInPlaceYawCurveName = "root_rotation_Z";
+
 private:
 	UPROPERTY()
 	AASCharacter* OwnerCharacter;

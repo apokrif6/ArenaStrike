@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/Locomotion/LocomotionDirectionAnimations.h"
+#include "Animation/Locomotion/TurnInPlaceAnimations.h"
 #include "ASAnimLayersInstance.generated.h"
 
 /**
@@ -39,6 +40,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Pivot|Animations")
 	FLocomotionDirectionAnimations JoggingPivotLocomotionDirectionAnimations;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Turn In Place|Animations")
+	FTurnInPlaceAnimations TurnInPlaceAnimations;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AimOffset|Animations")
 	TObjectPtr<UBlendSpace> AimOffsetBlendSpace;
