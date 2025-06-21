@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
+
+class UGameplayEffect;
 
 UCLASS()
 class ARENASTRIKE_API AWeapon : public AActor
@@ -20,9 +23,14 @@ public:
 
 	void Unequip();
 
+	USkeletalMeshComponent* GetSkeletalMeshComponent() const { return SkeletalMeshComponent; }
+
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Animation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|GAS")
+	TSubclassOf<UGameplayEffect> EquippedWeaponGameplayEffectToApplyToInstigator;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon|Animation")
 	TSubclassOf<UAnimInstance> AnimationLayer;
@@ -38,4 +46,6 @@ private:
 	ACharacter* InstigatorCharacter = nullptr;
 
 	void AttachWeaponToUnequippedSocket();
+
+	FActiveGameplayEffectHandle EquippedWeaponGameplayEffectHandle;
 };
